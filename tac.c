@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -30,12 +31,8 @@ static ll *dofile(FILE * inf, char *fname, char *pname, ll * head)
             fclose(inf);
         exit(EXIT_FAILURE);
     } else if (ferror(inf)) {
-        fprintf(stderr, "tac: file error on %s: %m\n", fname);
-        free_all_nodes(free_all_data(head));
-        free(line);
-        if (stdin != inf)
-            fclose(inf);
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "tac: file error on %s: %s\n", fname,
+                strerror(errno));
     }
 
     return head;
@@ -76,7 +73,8 @@ int main(int argc, char *argv[])
 
     for (; i < argc; i++) {
         if ((inf = fopen(argv[i], "rb")) == NULL) {
-            fprintf(stderr, "tac: file error on %s: %m\n", argv[i]);
+            fprintf(stderr, "tac: file error on %s: %s\n", argv[i],
+                    strerror(errno));
             continue;
         }
 
