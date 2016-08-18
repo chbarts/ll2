@@ -10,32 +10,8 @@ static ll *dofile(FILE * inf, char *fname, char *pname, ll * head)
     int res;
     char *line;
 
-    if (!head) {
-        if ((res = fggets(&line, inf)) != 0) {
-            if (res > 0) {
-                perror("tac: memory error");
-            } else {
-                if (ferror(inf)) {
-                    fprintf(stderr, "tac: file error on %s: %m\n", fname);
-                }
-            }
-
-            if (stdin != inf)
-                fclose(inf);
-            exit(EXIT_FAILURE);
-        }
-
-        if ((head = new_node(strlen(line), line, NULL)) == NULL) {
-            perror("tac: memory error");
-            free(line);
-            if (stdin != inf)
-                fclose(inf);
-            exit(EXIT_FAILURE);
-        }
-    }
-
     while ((res = fggets(&line, inf)) == 0) {
-        if ((tmp = new_node(strlen(line), line, NULL)) == NULL) {
+        if ((tmp = new_node(strlen(line), line, head)) == NULL) {
             perror("tac: memory error");
             free_all_nodes(free_all_data(head));
             free(line);
@@ -44,7 +20,7 @@ static ll *dofile(FILE * inf, char *fname, char *pname, ll * head)
             exit(EXIT_FAILURE);
         }
 
-        head = prepend_node(head, tmp);
+        head = tmp;
     }
 
     if (res > 0) {
